@@ -88,7 +88,7 @@ class SoundCloundBackend(VideoBackend):
         r = requests.get(self._base_url, data=params)
         json_response = json.loads(r.text)
         self._response = json_response
-        self.name = json_response.get("title")
+        self.name = u"%s" % json_response.get("title") 
         self.thumbnail = json_response.get("thumbnail_url")
         match = re.search(r'src="(.*?)"', json_response.get("html"))
         if match:
