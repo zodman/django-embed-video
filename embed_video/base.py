@@ -20,6 +20,7 @@ class NoIdVideoFound(Exception):
     pass
 
 
+
 def detect_backend(url):
     if DETECT_YOUTUBE.match(url):
         return YoutubeBackend(url)
@@ -86,6 +87,8 @@ class SoundCloundBackend(VideoBackend):
             'format': 'json', 'url': url,
         }
         r = requests.get(self._base_url, data=params)
+        if r.status_code != requests.codes.ok:
+            raise NoIdVideoFound	
         json_response = json.loads(r.text)
         self._response = json_response
         self.name = json_response.get("title")
