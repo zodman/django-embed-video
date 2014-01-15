@@ -1,7 +1,7 @@
 from django.template import Library, Node, TemplateSyntaxError
 from django.utils.safestring import mark_safe
 
-from ..base import detect_backend, SoundCloundBackend
+from ..base import detect_backend, SoundCloundBackend, NoIdVideoFound
 
 register = Library()
 
@@ -25,7 +25,11 @@ class VideoNode(Node):
     def render(self, context):
         url = self.url.resolve(context)
         context.push()
-        context[self.as_var] = detect_backend(url)
+        try:
+            context[self.as_var] = detect_backend(url)
+        except NoIdVideoFound:
+            return u""
+
         output = self.nodelist_file.render(context)
         context.pop()
         return output

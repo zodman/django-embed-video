@@ -67,8 +67,14 @@ class VideoBackend(object):
             d = dict(format="json", url=self._url)
             if 'json' in self._base_url:
                 del d['format']
-            r = requests.get(self._base_url, params = d)
-            self._json_response= json.loads(r.text)
+            try:    
+                r = requests.get(self._base_url, params = d)
+            except requests.models.ConnectionError:
+                raise NoIdVideoFound
+            try:
+                self._json_response = json.loads(r.text)
+            except ValueError:
+                raise NoIdVideoFound
         else:
             self._json_response= json_response
 
@@ -86,10 +92,16 @@ class SoundCloundBackend(VideoBackend):
         params = {
             'format': 'json', 'url': url,
         }
-        r = requests.get(self._base_url, data=params)
+        try:
+            r = requests.get(self._base_url, data=params)
+        except requests.models.ConnectionError:
+            raise NoIdVideoFound
         if r.status_code != requests.codes.ok:
             raise NoIdVideoFound	
-        json_response = json.loads(r.text)
+        try:
+            json_response = json.loads(r.text)
+        except ValueError:
+            raise NoIdVideoFound
         self._response = json_response
         self.name = json_response.get("title")
         self.thumbnail = json_response.get("thumbnail_url")
