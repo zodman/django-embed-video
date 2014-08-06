@@ -92,8 +92,9 @@ class SoundCloundBackend(VideoBackend):
         params = {
             'format': 'json', 'url': url,
         }
+	
         try:
-            r = requests.get(self._base_url, data=params)
+            r = requests.post(self._base_url, data=params)
         except requests.models.ConnectionError:
             raise NoIdVideoFound
         if r.status_code != requests.codes.ok:
